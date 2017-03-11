@@ -16,7 +16,8 @@ with open(filename, 'rb') as csvFile, tempfile:
     # 逐行讀取CSV內容
     for row in reader:
         # 如果成功下載 將isDownload改為y
-        row[4] = 'y'
+        if False:
+            row[4] = 'y'
         # 將每行寫入temp csv
         writer.writerow(row)
 
