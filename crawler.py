@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests
-import re
-import sys
+import sys,os,re
 
 class crawler:
     def __init__(self):
@@ -40,12 +39,26 @@ class crawler:
 
         return videoLinkList
 
-    def downloadVideo(self,url,path):
+    def downloadVideo(self,url,path=None):
+        '''
+        :param url:
+        :param path:影片存放路徑 ex 必練音階區/C大調音階
+        :return:
+        '''
         r = self.session.get(url, stream=True)
         total_length = r.headers.get('content-length')
+        fileName = 'test.mp4' # 檔案名稱
+        print(u'開始下載影片'+path if path is not None else '')
+        if path is None:
+            path = self.downloadRootPath
+        else:
+            path = self.downloadRootPath+'\\'+ path
+        # 如果目錄不存在就創建目錄
+        if not os.path.exists(path):
+            os.makedirs(path)
 
-        print(u'開始下載影片'+path)
-        with open(self.downloadRootPath+'\\'+ path, 'wb') as f:
+        # 開始下載
+        with open(path+'\\'+ fileName, 'wb') as f:
             if total_length is None:  # no content length header
                 f.write(r.content)
             else:
@@ -65,5 +78,5 @@ if __name__ =="__main__":
     cw = crawler()
     videoList = cw.getVideoLinkList('http://realsound.tw/members/style-step2/')
     for i,url in enumerate(videoList):
-        cw.downloadVideo(url,'test.mp4')
+        cw.downloadVideo(url)
 
