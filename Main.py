@@ -2,8 +2,10 @@
 import csv
 import pandas as pd
 from tempfile import NamedTemporaryFile
-import shutil
-
+import shutil,sys
+import logging
+logging.basicConfig(filename='event.log',level=logging.DEBUG)
+logging.info('========開始執行程式============')
 
 filename = 'url.csv'
 
@@ -20,7 +22,9 @@ with open(filename, 'rb') as csvFile, tempfile:
             row[4] = 'y'
         # 將每行寫入temp csv
         writer.writerow(row)
+        logging.info('目前進度 '+str(row[0])+':'+str(row[1])+':'+str(row[2]))
 
 # 將temp csv覆蓋原csv
 shutil.move(tempfile.name, filename)
+
 
