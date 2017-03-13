@@ -9,7 +9,8 @@ logging.basicConfig(filename='event.log',level=logging.DEBUG)
 logging.info('========開始執行程式============')
 
 filename = 'url.csv'
-
+# 登入吉他網
+cw = crawler()
 
 tempfile = NamedTemporaryFile(delete=False)
 # 開啟CSV
@@ -20,7 +21,6 @@ with open(filename, 'rb') as csvFile, tempfile:
     for row in reader:
         if row[4] == 'n':
             print('檔名:'+str(row[0])+' 目錄:' + str(row[2])+str(row[1]))
-            cw = crawler()
             videoList = cw.getVideoLinkList(str(row[3]))
             for i, url in enumerate(videoList):
                 cw.downloadVideo(str(row[0]), url)

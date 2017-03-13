@@ -4,11 +4,15 @@ import sys,os,re
 
 class crawler:
     def __init__(self):
-        self.session = requests.Session()
+        self.session = self.login()
         self.downloadRootPath = u'D:\嗚流吉他' # 下載影片的根目錄
 
     def login(self):
-        s = None
+        s = requests.Session()
+        r = s.get('http://realsound.tw/active-member/center/member-login/')
+        r = s.get('http://realsound.tw/active-member/')
+        print(r.text)
+
         return s
 
     # 取得存放vimeo影片的iframe的連結 (有可能有多個iframe 要改成回傳list)
@@ -78,7 +82,7 @@ class crawler:
 
 if __name__ =="__main__":
     cw = crawler()
-    videoList = cw.getVideoLinkList('http://realsound.tw/members/always-1/')
-    for i,url in enumerate(videoList):
-        cw.downloadVideo('test',url)
+    # videoList = cw.getVideoLinkList('http://realsound.tw/members/always-1/')
+    # for i,url in enumerate(videoList):
+    #     cw.downloadVideo('test',url)
 
