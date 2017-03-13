@@ -58,7 +58,7 @@ class crawler:
         if path is None:
             path = self.downloadRootPath
         else:
-            path = self.downloadRootPath+'\\'+ path
+            path = self.downloadRootPath+'\\'+ path.decode('utf-8')
         # 如果目錄不存在就創建目錄
         if not os.path.exists(path):
             os.makedirs(path)
@@ -66,7 +66,7 @@ class crawler:
         UniquefileName = self.GetFileSeqName(path,fileName)
 
         # 開始下載
-        with open(path+'\\'+ UniquefileName.decode('utf-8'), 'wb') as f:
+        with open(path+'\\'+ UniquefileName.replace('/','／').decode('utf-8'), 'wb') as f:
             if total_length is None:  # no content length header
                 f.write(r.content)
             else:
@@ -84,7 +84,7 @@ class crawler:
     # 取得不重覆的檔案名稱 ex C大調指版.mp4  C大調指版_1.mp4
     def GetFileSeqName(self,path,inputName):
         for root, dirs, files in os.walk(path):
-            indices = [i for i, x in enumerate(files) if x.startswith(inputName)]
+            indices = [i for i, x in enumerate(files) if x.startswith(inputName.decode('utf-8'))]
 
 
         fullname = inputName + '_' + str(len(indices)+1) +'.mp4'
