@@ -54,7 +54,7 @@ class crawler:
         r = self.session.get(url, stream=True)
         total_length = r.headers.get('content-length')
 
-        print(u'開始下載影片 檔名:'+fileName if fileName is not None else '' +'  目錄:'+ path if path is not None else '')
+        print(u'開始下載影片 檔名:'+fileName.decode('utf-8') if fileName is not None else '' +u'  目錄:'+ path.decode('utf-8') if path is not None else '')
         if path is None:
             path = self.downloadRootPath
         else:
@@ -66,7 +66,7 @@ class crawler:
         UniquefileName = self.GetFileSeqName(path,fileName)
 
         # 開始下載
-        with open(path+'\\'+ UniquefileName, 'wb') as f:
+        with open(path+'\\'+ UniquefileName.decode('utf-8'), 'wb') as f:
             if total_length is None:  # no content length header
                 f.write(r.content)
             else:

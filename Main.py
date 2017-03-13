@@ -17,6 +17,7 @@ tempfile = NamedTemporaryFile(delete=False)
 with open(filename, 'rb') as csvFile, tempfile:
     reader = csv.reader(csvFile, delimiter=',', quotechar='"')
     writer = csv.writer(tempfile, delimiter=',', quotechar='"')
+    next(reader, None)  # skip the headers
     # 逐行讀取CSV內容
     for row in reader:
         if row[4] == 'n':
