@@ -39,7 +39,7 @@ class crawler:
 
         return videoLinkList
 
-    def downloadVideo(self,url,fileName,path=None):
+    def downloadVideo(self,fileName,url,path=None):
         '''
         :param url:
         :param path:影片存放路徑 ex 必練音階區/C大調音階
@@ -78,7 +78,7 @@ class crawler:
 
 if __name__ =="__main__":
     cw = crawler()
-    videoList = cw.getVideoLinkList('http://realsound.tw/members/style-step2/')
+    videoList = cw.getVideoLinkList('http://realsound.tw/members/always-1/')
     for i,url in enumerate(videoList):
         cw.downloadVideo('test',url)
 
