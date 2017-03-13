@@ -9,9 +9,11 @@ class crawler:
 
     def login(self):
         s = requests.Session()
-        r = s.get('http://realsound.tw/active-member/center/member-login/')
-        r = s.get('http://realsound.tw/active-member/')
-        print(r.text)
+        payload = {'_wpnonce': '4e8a9762ee', '_wp_http_referer': '/active-member/member-logout/',
+                   'login_user_name':'vi000246','login_pwd':'uish2013','testcookie':'1','doLogin':'登入'}
+        r = s.post('http://realsound.tw/active-member/center/member-login/', data=payload)
+        # r = s.get('http://realsound.tw/active-member/')
+        # print(r.text)
 
         return s
 
@@ -51,10 +53,8 @@ class crawler:
         '''
         r = self.session.get(url, stream=True)
         total_length = r.headers.get('content-length')
-        # 組出檔案名稱
-        fileName = fileName + '.mp4'
 
-        print(u'開始下載影片'+path if path is not None else '')
+        print(u'開始下載影片 檔名:'+fileName if fileName is not None else '' +'  目錄:'+ path if path is not None else '')
         if path is None:
             path = self.downloadRootPath
         else:
@@ -62,9 +62,11 @@ class crawler:
         # 如果目錄不存在就創建目錄
         if not os.path.exists(path):
             os.makedirs(path)
+        # 如果已存在 xxx.mp4 就重命名為xxx_1.mp4
+        UniquefileName = self.GetFileSeqName(path,fileName)
 
         # 開始下載
-        with open(path+'\\'+ fileName, 'wb') as f:
+        with open(path+'\\'+ UniquefileName, 'wb') as f:
             if total_length is None:  # no content length header
                 f.write(r.content)
             else:
@@ -79,6 +81,14 @@ class crawler:
                         sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50 - done)))
                         sys.stdout.flush()
         return path
+    # 取得不重覆的檔案名稱 ex C大調指版.mp4  C大調指版_1.mp4
+    def GetFileSeqName(self,path,inputName):
+        for root, dirs, files in os.walk(path):
+            indices = [i for i, x in enumerate(files) if x.startswith(inputName)]
+
+
+        fullname = inputName + '_' + str(len(indices)+1) +'.mp4'
+        return fullname
 
 if __name__ =="__main__":
     cw = crawler()

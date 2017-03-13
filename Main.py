@@ -20,7 +20,7 @@ with open(filename, 'rb') as csvFile, tempfile:
     # 逐行讀取CSV內容
     for row in reader:
         if row[4] == 'n':
-            print('檔名:'+str(row[0])+' 目錄:' + str(row[2])+str(row[1]))
+            # print('檔名:'+str(row[0])+' 目錄:' + str(row[2])+str(row[1]))
             videoList = cw.getVideoLinkList(str(row[3]))
             for i, url in enumerate(videoList):
                 cw.downloadVideo(str(row[0]), url)
