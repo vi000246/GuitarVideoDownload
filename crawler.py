@@ -25,7 +25,7 @@ class crawler:
         '''
         # step1 取得頁面上的vimeo iframe連結
         r = self.session.get(url)
-        iframeList = re.findall(r'(?P<match>//player.vimeo.com/video/\d*/?[^\"\"]*)', r.text)
+        iframeList = re.findall(r'(?P<match>(?:http:)?//player.vimeo.com/video/\d*/?[^\"\"]*)', r.text)
         if iframeList is None:
             raise '找不到vimeo的iframe'
         # step2 loop list裡的iframe url 取得影片連結
@@ -35,7 +35,9 @@ class crawler:
         }
         videoLinkList = []
         for i,url in enumerate(iframeList):
-            r2 = self.session.get('https:' + url, headers=headers)
+            if url.startswith('/'):
+                url = 'https:' + url
+            r2 = self.session.get(url, headers=headers)
 
             # 找出vimeo 影片的下載連結
             m2 = re.findall(r'(?P<match>https?://[0-9a-zA-Z-]*.vimeocdn.com/[a-z-\d/]+.mp4[^\"]*)', r2.text)
