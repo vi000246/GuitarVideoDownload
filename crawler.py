@@ -91,11 +91,14 @@ class crawler:
         return path
     # 取得不重覆的檔案名稱 ex C大調指版.mp4  C大調指版_1.mp4
     def GetFileSeqName(self,path,inputName):
+        inputName = inputName
+        num = [] # 因為os.walk會走進sub dirctory 所以要比對子層跟父層的檔案數
         for root, dirs, files in os.walk(path):
             indices = [i for i, x in enumerate(files) if x.startswith(inputName.decode('utf-8'))]
+            num.append(len(indices))
 
 
-        fullname = inputName + '_' + str(len(indices)+1) +'.mp4'
+        fullname = inputName + '_' + str(max(num)+1) +'.mp4'
         return fullname
 
 if __name__ =="__main__":
