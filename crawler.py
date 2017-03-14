@@ -9,7 +9,13 @@ class crawler:
 
     def login(self):
         s = requests.Session()
-        payload = {'_wpnonce': '4e8a9762ee', '_wp_http_referer': '/active-member/member-logout/',
+        r = s.get('http://realsound.tw/active-member/center/member-login/')
+
+        result = re.search(r'name=\"_wpnonce\" value=\"(?P<wpnonce>\w*)\"', r.text)
+
+        wpnonce = result.group('wpnonce') # CSRF token
+
+        payload = {'_wpnonce': wpnonce, '_wp_http_referer': '/active-member/member-logout/',
                    'login_user_name':'vi000246','login_pwd':'uish2013','testcookie':'1','doLogin':'登入'}
         r = s.post('http://realsound.tw/active-member/center/member-login/', data=payload)
         # r = s.get('http://realsound.tw/active-member/')
