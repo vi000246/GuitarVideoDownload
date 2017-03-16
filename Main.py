@@ -4,6 +4,7 @@ import pandas as pd
 from tempfile import NamedTemporaryFile
 import shutil,sys
 from crawler import crawler
+import time
 import logging
 logging.basicConfig(filename='event.log',level=logging.DEBUG)
 logging.info('========開始執行程式============')
@@ -27,6 +28,7 @@ with open(filename, 'rb') as csvFile, tempfile:
                        str('\\' if row[1] is not '' else '')+\
                        str(row[1] if row[1] is not None else '')
             for i, url in enumerate(videoList):
+                time.sleep(10)
                 cw.downloadVideo(str(row[0]), url,SavePath)
 
             # 如果成功下載 將isDownload改為y

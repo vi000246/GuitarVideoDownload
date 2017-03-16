@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import requests
 import sys,os,re
+from retrying import retry
+import logging
+logging.basicConfig(filename='event.log',level=logging.DEBUG)
 
 class crawler:
     def __init__(self):
@@ -44,7 +47,6 @@ class crawler:
             if url.startswith('/'):
                 url = 'https:' + url
             r2 = self.session.get(url, headers=headers)
-
             # 找出vimeo 影片的下載連結
             m2 = re.findall(r'(?P<match>https?://[0-9a-zA-Z-]*.vimeocdn.com/[a-z-\d/]+.mp4[^\"]*)', r2.text)
             if m2 is None:
@@ -53,41 +55,48 @@ class crawler:
 
         return videoLinkList
 
+    @retry(stop_max_attempt_number=10,wait_fixed=20000)
     def downloadVideo(self,fileName,url,path=None):
         '''
         :param url:
         :param path:影片存放路徑 ex 必練音階區/C大調音階
         :return:
         '''
-        r = self.session.get(url, stream=True)
-        total_length = r.headers.get('content-length')
+        try:
+            headers = {'User-agent': 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:22.0) Gecko/20100101 Firefox/22.0',
+                       'Connection': 'close'}
+            r = self.session.get(url,  headers = headers, stream=True)
+            r.connection.close()
+            total_length = r.headers.get('content-length')
 
-        print(u'開始下載影片 檔名:'+fileName.decode('utf-8') if fileName is not None else '' +u'  目錄:'+ path.decode('utf-8') if path is not None else '')
-        if path is None:
-            path = self.downloadRootPath
-        else:
-            path = self.downloadRootPath+'\\'+ path.decode('utf-8')
-        # 如果目錄不存在就創建目錄
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # 如果已存在 xxx.mp4 就重命名為xxx_1.mp4
-        UniquefileName = self.GetFileSeqName(path,fileName)
-
-        # 開始下載
-        with open(path+'\\'+ UniquefileName.replace('/','／').decode('utf-8'), 'wb') as f:
-            if total_length is None:  # no content length header
-                f.write(r.content)
+            print(u'開始下載影片 檔名:'+fileName.decode('utf-8') if fileName is not None else '' +u'  目錄:'+ path.decode('utf-8') if path is not None else '')
+            if path is None:
+                path = self.downloadRootPath
             else:
-                dl = 0
-                total_length = int(total_length)
-                for chunk in r.iter_content(chunk_size=1024):
-                    dl += len(chunk)
-                    if chunk:  # filter out keep-alive new chunks
-                        f.write(chunk)
-                        done = int(50 * dl / total_length)
-                        # progress bar
-                        sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50 - done)))
-                        sys.stdout.flush()
+                path = self.downloadRootPath+'\\'+ path.decode('utf-8')
+            # 如果目錄不存在就創建目錄
+            if not os.path.exists(path):
+                os.makedirs(path)
+            # 如果已存在 xxx.mp4 就重命名為xxx_1.mp4
+            UniquefileName = self.GetFileSeqName(path,fileName)
+
+            # 開始下載
+            with open(path+'\\'+ UniquefileName.replace('/','／').decode('utf-8'), 'wb') as f:
+                if total_length is None:  # no content length header
+                    f.write(r.content)
+                else:
+                    dl = 0
+                    total_length = int(total_length)
+                    for chunk in r.iter_content(chunk_size=1024):
+                        dl += len(chunk)
+                        if chunk:  # filter out keep-alive new chunks
+                            f.write(chunk)
+                            done = int(50 * dl / total_length)
+                            # progress bar
+                            sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50 - done)))
+                            sys.stdout.flush()
+        except Exception, e:
+            logging.error('下載檔案失敗: '+ str(e))
         return path
     # 取得不重覆的檔案名稱 ex C大調指版.mp4  C大調指版_1.mp4
     def GetFileSeqName(self,path,inputName):
