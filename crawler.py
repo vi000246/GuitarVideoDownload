@@ -19,7 +19,7 @@ class crawler:
         wpnonce = result.group('wpnonce') # CSRF token
 
         payload = {'_wpnonce': wpnonce, '_wp_http_referer': '/active-member/member-logout/',
-                   'login_user_name':'vi000246','login_pwd':'uish2013','testcookie':'1','doLogin':'登入'}
+                   'login_user_name':'','login_pwd':'','testcookie':'1','doLogin':'登入'}
         r = s.post('http://realsound.tw/active-member/center/member-login/', data=payload)
         # r = s.get('http://realsound.tw/active-member/')
         # print(r.text)
